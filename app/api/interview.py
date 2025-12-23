@@ -8,8 +8,11 @@ router = APIRouter()
 
 @router.post("/question")
 def generate_question(req: JobRequest):
+    """
+    req.job: 원하는 직군, 주제, 역할 등 자유롭게 입력 가능
+    """
     prompt = f"""
-너는 {req.job} 개발자 면접관이다. 신입 기준 질문을 하나 만들어줘.
+너는 {req.job} 전문가 면접관이다. 신입 기준 질문을 하나 만들어줘.
 조건:
 1. 질문은 실무에 바로 관련 있는 내용이어야 함.
 2. 질문 유형: 이론 또는 실습
@@ -18,9 +21,9 @@ def generate_question(req: JobRequest):
 5. JSON 형태로만 응답
 형식:
 {{
-  "question: "여기에 질문내용",
-  "category: "이론/실습",
-  "difficulty: "신입"
+  "question": "여기에 질문내용",
+  "category": "이론/실습",
+  "difficulty": "신입"
 }}
 """
     try:

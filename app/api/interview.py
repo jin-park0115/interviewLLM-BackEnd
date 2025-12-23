@@ -2,16 +2,31 @@ from fastapi import APIRouter
 from app.schemas.interview import JobRequest, AnswerRequest, FeedbackResponse
 from app.services.gemini import ask_gemini
 import json
-import re  # <- 추가
+import re
 
 router = APIRouter()
 
 @router.post("/question")
 def generate_question(req: JobRequest):
-    prompt = f"너는 {req.job} 개발자 면접관이다. 신입 기준 질문을 하나 만들어줘."
+    prompt = f"""
+너는 {req.job} 개발자 면접관이다. 신입 기준 질문을 하나 만들어줘.
+조건:
+1. 질문은 실무에 바로 관련 있는 내용이어야 함.
+2. 질문 유형: 이론 또는 실습
+3. 난이도 신입
+4. 답변 예상 길이: 3~5문장
+5. JSON 형태로만 응답
+형식:
+{{
+  "question: "여기에 질문내용",
+  "category: "이론/실습",
+  "difficulty: "신입"
+}}
+"""
     try:
         question = ask_gemini(prompt)
-        return {"question": question}
+        cleaned = re.sub(r"```json|```", "", question).strip()
+        return json.loads(cleaned)
     except Exception as e:
         return {"error": str(e)}
 
